@@ -1,0 +1,24 @@
+[
+    {
+        "id": 0,
+        "firstName": "Austine",
+        "lastName": "Echavez",
+        "aptDate":"2018-11-28 13:30",
+        "bookingDetails": "Hi Im Austine Booking for 360 Videobooth"
+    },
+    {
+        "id": 1,
+        "firstName": "Kaisha",
+        "lastName": "Isanan",
+        "aptDate":"2020-12-06 11:30",
+        "bookingDetails": "Hi Im Kaisha Booking for Photobooth"
+    },
+    {
+        "id": 3,
+        "firstName": "Marion",
+        "lastName": "Dacalos",
+        "aptDate":"2024-04-28 19:30",
+        "bookingDetails": "Hi Im Marion Booking for 360 Videobooth for Free"
+    }
+
+]
