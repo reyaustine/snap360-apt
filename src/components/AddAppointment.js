@@ -91,7 +91,25 @@ import { addDoc , doc, setDoc, collection } from 'firebase/firestore';
 import { db,storage } from '../firebase'; // Adjust the path to your firebase configuration file
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-function AddAppointment({ lastId, onSendAppointment }) {
+function AddAppointment({ lastId, onSendAppointment , selectedAppointment }) {
+
+    //const [selectedFormData, setSelectedFormData] = useState({
+        const [formData, setFormData] = useState({
+        // Initialize formData state with default values or empty strings
+        fullName: selectedAppointment ? selectedAppointment.fullName : "",
+        contactNo: selectedAppointment ? selectedAppointment.contactNo : "",
+        status: selectedAppointment ? selectedAppointment.status : "",
+        paidVia: selectedAppointment ? selectedAppointment.paidVia : "",
+        proofPhoto: selectedAppointment ? selectedAppointment.proofPhoto : "",
+        rate: selectedAppointment ? selectedAppointment.rate : "",
+        dpAmount: selectedAppointment ? selectedAppointment.dpAmount : "",
+        venue: selectedAppointment ? selectedAppointment.venue : "",
+        status: selectedAppointment ? selectedAppointment.status : "",
+        aptDate: selectedAppointment ? selectedAppointment.aptDate : "",
+        aptTime: selectedAppointment ? selectedAppointment.aptTime : "",
+        bookingDetails: selectedAppointment ? selectedAppointment.bookingDetails : ""
+      });
+    
     const clearData = {
         fullName: '',
         contactNo: '',
@@ -108,7 +126,7 @@ function AddAppointment({ lastId, onSendAppointment }) {
     }
 
     let [toggleForm, setToggleForm] = useState(false);
-    let [formData, setFormData] = useState(clearData);
+    //let [formData, setFormData] = useState(clearData);
 
     async function formDataPublish() {
         // const storageRef = ref(storage, 'images/' + formData.proofPhoto);
@@ -160,7 +178,6 @@ function AddAppointment({ lastId, onSendAppointment }) {
         } catch (e) {
             console.error("Error adding document: ", e);
         }
-        
     }
 
     return (

@@ -1,8 +1,9 @@
 import { Button, ListGroup } from "react-bootstrap"
 import Image from 'react-bootstrap/Image';
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { TbEdit } from "react-icons/tb";
 
-function AppointmentInfo({appointment, onDeleteAppointment}) {
+function AppointmentInfo({appointment, onDeleteAppointment,onUpdateAppointment }) {
 
    
  
@@ -19,8 +20,8 @@ function AppointmentInfo({appointment, onDeleteAppointment}) {
                 {appointment.photoProof && <Image src={appointment.photoProof} rounded />}
                 <p><strong>Proof of Payment: {appointment.photoProof}</strong></p>
                 <p><strong>Details: {appointment.bookingDetails}</strong></p>
-                
                 <Button  onClick={() => {onDeleteAppointment(appointment.id)}} size="sm" variant="danger"><RiDeleteBin6Line /> Delete</Button>
+                <Button onClick={() => {onUpdateAppointment(appointment)}} size="sm" variant="success"><TbEdit />Update</Button>
             </ListGroup.Item>
         </>
     )

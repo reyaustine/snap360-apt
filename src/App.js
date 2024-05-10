@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BsFillCalendar2CheckFill } from "react-icons/bs";
-import { Row, Col, Container, ListGroup, Card } from 'react-bootstrap';
+import { Row, Col, Container, ListGroup, Card , Modal, Button} from 'react-bootstrap';
 import Search from "./components/Search"
 import AddAppointment from './components/AddAppointment';
 import AppointmentInfo from './components/AppointmentInfo';
@@ -33,40 +33,23 @@ function App() {
     };
   }, []); 
 
-  // const handleDeleteAppointment = async (id) => {
-  //   const customDocId = "aptId" + id;
-  //   const updateDocRef = doc(db, "appointments",customDocId);
-  //   await updateDoc(updateDocRef, {
-  //     status: "Done",
-  // });
-  
-  // }
-
   const handleDeleteAppointment = async (id) => {
     const customDocId = "aptId" + id;
     const updateDocRef = doc(db, "appointments", customDocId);
-    
     try {
-      // Show message prompt for confirmation
       const confirmDelete = window.confirm("Are you sure you want to mark this appointment as 'Done'?");
-
       if (confirmDelete) {
         // Update appointment status to "Done"
         await updateDoc(updateDocRef, { status: "Done" });
-        
         // Refresh appointment list
         const updatedAppointments = appointmentList.filter(appointment => appointment.id !== id);
         setAppointmentList(updatedAppointments);
-        
         console.log("Appointment marked as 'Done' with ID:", customDocId);
       }
     } catch (error) {
       console.error("Error marking appointment as 'Done':", error);
     }
   };
-
-  
-  
 
   const filteredAppointments = appointmentList.length > 0 ? appointmentList.filter(
     item => {
@@ -94,9 +77,50 @@ function App() {
     const sortByB = b[sortBy] ? b[sortBy].toLowerCase() : "";
     return sortByA < sortByB ? -1 * order : 1 * order;
   }) : [];
+  const [selectedAppointment, setSelectedAppointment] = useState(null); // Define setSelectedAppointment
+  const [showForm, setShowForm] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  // const handleUpdateAppointment = (appointment) => {
+  //   console.log(appointment)
+  //   setSelectedAppointment(appointment);
+  //   setShowForm(true);
+  // };
+  const handleUpdateAppointment = (appointment) => {
+    console.log(appointment)
+    setSelectedAppointment(appointment);
+    setShowModal(true); // Show the modal
+  };
+  const handleCloseModal = () => {
+    setShowModal(false); // Close the modal
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      const customDocId = "aptId" + selectedAppointment.id;
+      const updateDocRef = doc(db, "appointments", customDocId);
+      const updatedAppointmentData = { ...selectedAppointment, status: "Updated" }; // Modify the status or any other fields as needed
+      await updateDoc(updateDocRef, updatedAppointmentData);
+      // Update the appointment list state if necessary
+      // For example, you might want to update the appointment list with the updated appointment data
+      // You can do this by finding the index of the selected appointment in the list and replacing it with the updated data
+      const updatedAppointments = appointmentList.map(appointment => {
+        if (appointment.id === selectedAppointment.id) {
+          return { ...appointment, ...updatedAppointmentData };
+        }
+        return appointment;
+      });
+      setAppointmentList(updatedAppointments);
+      setShowModal(false); // Close the modal after successful update
+      console.log("Appointment updated successfully:", customDocId);
+    } catch (error) {
+      console.error("Error updating appointment:", error);
+      // Handle error, show error message to the user, etc.
+    }
+  };
   
 
   return (
+    
     <div className="App">
       <Container>
         <Row>
@@ -130,13 +154,98 @@ function App() {
               <ListGroup variant='flush'>
                 {filteredAppointments.map(appointment => (
                   <AppointmentInfo key={appointment.id} appointment={appointment}
-                    onDeleteAppointment={handleDeleteAppointment} />
+                    onDeleteAppointment={handleDeleteAppointment}
+                    onUpdateAppointment={handleUpdateAppointment}
+                    />
                 ))}
               </ListGroup>
             </Card>
           </Col>
         </Row>
       </Container>
+       {/* Modal for updating appointment */}
+       <Modal show={showModal} onHide={handleCloseModal}>
+  <Modal.Header closeButton>
+    <Modal.Title>Update Appointment</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+  {selectedAppointment && (
+    <form>
+      <div className="mb-3">
+        <label htmlFor="fullName" className="form-label">Full Name</label>
+        <input 
+          type="text" 
+          className="form-control" 
+          id="fullName" 
+          value={selectedAppointment.fullName || ''} 
+          onChange={(e) => setSelectedAppointment({...selectedAppointment, fullName: e.target.value})} 
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="status" className="form-label">Status</label>
+        <input 
+          type="text" 
+          className="form-control" 
+          id="status" 
+          value={selectedAppointment.status || ''} 
+          onChange={(e) => setSelectedAppointment({...selectedAppointment, status: e.target.value})} 
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="paidVia" className="form-label">Paid Via</label>
+        <input 
+          type="text" 
+          className="form-control" 
+          id="paidVia" 
+          value={selectedAppointment.paidVia || ''} 
+          onChange={(e) => setSelectedAppointment({...selectedAppointment, paidVia: e.target.value})} 
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="venue" className="form-label">Venue</label>
+        <input 
+          type="text" 
+          className="form-control" 
+          id="venue" 
+          value={selectedAppointment.venue || ''} 
+          onChange={(e) => setSelectedAppointment({...selectedAppointment, venue: e.target.value})} 
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="aptDate" className="form-label">Appointment Date</label>
+        <input 
+          type="text" 
+          className="form-control" 
+          id="aptDate" 
+          value={selectedAppointment.aptDate || ''} 
+          onChange={(e) => setSelectedAppointment({...selectedAppointment, aptDate: e.target.value})} 
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="bookingDetails" className="form-label">Booking Details</label>
+        <textarea 
+          className="form-control" 
+          id="bookingDetails" 
+          rows="3" 
+          value={selectedAppointment.bookingDetails || ''} 
+          onChange={(e) => setSelectedAppointment({...selectedAppointment, bookingDetails: e.target.value})} 
+        ></textarea>
+      </div>
+    </form>
+  )}
+</Modal.Body>
+
+
+    <Modal.Footer>
+    <Button variant="secondary" onClick={handleCloseModal}>
+      Close
+    </Button>
+    <Button variant="primary" onClick={handleSaveChanges}>
+      Save Changes
+    </Button>
+  </Modal.Footer>
+</Modal>
+
     </div>
   );
 }
