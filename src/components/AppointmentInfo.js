@@ -19,7 +19,8 @@ function AppointmentInfo({appointment, onDeleteAppointment}) {
                 {appointment.photoProof && <Image src={appointment.photoProof} rounded />}
                 <p><strong>Proof of Payment: {appointment.photoProof}</strong></p>
                 <p><strong>Details: {appointment.bookingDetails}</strong></p>
-                <Button onClick={() => {onDeleteAppointment(appointment.id)}} size="sm" variant="danger"><RiDeleteBin6Line /> Delete</Button>
+                
+                <Button  onClick={() => {onDeleteAppointment(appointment.id)}} size="sm" variant="danger"><RiDeleteBin6Line /> Delete</Button>
             </ListGroup.Item>
         </>
     )

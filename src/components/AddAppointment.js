@@ -87,7 +87,7 @@
 
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import { useState } from "react";
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc , doc, setDoc, collection } from 'firebase/firestore';
 import { db,storage } from '../firebase'; // Adjust the path to your firebase configuration file
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -111,22 +111,22 @@ function AddAppointment({ lastId, onSendAppointment }) {
     let [formData, setFormData] = useState(clearData);
 
     async function formDataPublish() {
-        const storageRef = ref(storage, 'images/' + formData.proofPhoto.name);
-        try {
-            await uploadBytes(storageRef, formData.proofPhoto);
-            console.log("File uploaded successfully!");
-        } catch (error) {
-            console.error("Error uploading file: ", error);
-            return;
-        }
-        const downloadURL = await getDownloadURL(storageRef);
+        // const storageRef = ref(storage, 'images/' + formData.proofPhoto);
+        // try {
+        //     await uploadBytes(storageRef, formData.proofPhoto);
+        //     console.log("File uploaded successfully!");
+        // } catch (error) {
+        //     console.error("Error uploading file: ", error);
+        //     return;
+        // }
+        // const downloadURL = await getDownloadURL(storageRef);
         const appointmentInfo = {
             id: lastId + 1,
             fullName: formData.fullName,
             contactNo: formData.contactNo,
             status: formData.status,
             paidVia: formData.paidVia,
-            proofPhoto: downloadURL,
+            proofPhoto: 'downloadURL',
             dpAmount: formData.dpAmount,
             rate: formData.rate,
             venue: formData.venue,
@@ -134,16 +134,33 @@ function AddAppointment({ lastId, onSendAppointment }) {
             bookingDetails: formData.bookingDetails
         }
         // Save data to Firestore
+        // try {
+        //     const docRef = await addDoc(collection(db, 'appointments'), appointmentInfo);
+        //     // Call onSendAppointment only after data is successfully saved to Firestore
+        //     onSendAppointment(appointmentInfo);
+        //     setFormData(clearData);
+        //     setToggleForm(!toggleForm);
+        //     console.log("Document written with ID: ", docRef.id);
+        // } catch (e) {
+        //     console.error("Error adding document: ", e);
+        // }
+
         try {
-            const docRef = await addDoc(collection(db, 'appointments'), appointmentInfo);
+            const customDocId = "aptId" + appointmentInfo.id; // Replace "yourCustomId" with your desired custom ID
+            const customDocRef = doc(collection(db, 'appointments'), customDocId);
+            
+            // Set the document data using the custom document reference
+            await setDoc(customDocRef, appointmentInfo);
+        
             // Call onSendAppointment only after data is successfully saved to Firestore
             onSendAppointment(appointmentInfo);
             setFormData(clearData);
             setToggleForm(!toggleForm);
-            console.log("Document written with ID: ", docRef.id);
+            console.log("Document written with ID: ", customDocId);
         } catch (e) {
             console.error("Error adding document: ", e);
         }
+        
     }
 
     return (
