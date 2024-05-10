@@ -78,13 +78,8 @@ function App() {
     return sortByA < sortByB ? -1 * order : 1 * order;
   }) : [];
   const [selectedAppointment, setSelectedAppointment] = useState(null); // Define setSelectedAppointment
-  const [showForm, setShowForm] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  // const handleUpdateAppointment = (appointment) => {
-  //   console.log(appointment)
-  //   setSelectedAppointment(appointment);
-  //   setShowForm(true);
-  // };
+  
   const handleUpdateAppointment = (appointment) => {
     console.log(appointment)
     setSelectedAppointment(appointment);
@@ -100,9 +95,6 @@ function App() {
       const updateDocRef = doc(db, "appointments", customDocId);
       const updatedAppointmentData = { ...selectedAppointment, status: "Updated" }; // Modify the status or any other fields as needed
       await updateDoc(updateDocRef, updatedAppointmentData);
-      // Update the appointment list state if necessary
-      // For example, you might want to update the appointment list with the updated appointment data
-      // You can do this by finding the index of the selected appointment in the list and replacing it with the updated data
       const updatedAppointments = appointmentList.map(appointment => {
         if (appointment.id === selectedAppointment.id) {
           return { ...appointment, ...updatedAppointmentData };
@@ -114,19 +106,18 @@ function App() {
       console.log("Appointment updated successfully:", customDocId);
     } catch (error) {
       console.error("Error updating appointment:", error);
-      // Handle error, show error message to the user, etc.
     }
   };
   
-
   return (
-    
     <div className="App">
       <Container>
         <Row>
           <Col>
             <h1 className='text-center fw-light mt-3'><BsFillCalendar2CheckFill/> Appointments</h1>
+           
           </Col>
+          
         </Row>
         <Row className='justify-content-center'>
           <AddAppointment 
@@ -136,7 +127,7 @@ function App() {
             
         </Row>
         <Row className='justify-content-center'>
-          <Col md="4">
+          <Col md="8">
             <Search 
               query={query}
               onQueryChange={myQuery => setQuery(myQuery)}
@@ -145,7 +136,8 @@ function App() {
               sortBy={sortBy}
               onSortByChange={mySort => setSortBy(mySort)}
             />
-          </Col>
+          </Col >
+         
         </Row>
         <Row className='justify-content-center'> 
           <Col md="8">
@@ -165,86 +157,84 @@ function App() {
       </Container>
        {/* Modal for updating appointment */}
        <Modal show={showModal} onHide={handleCloseModal}>
-  <Modal.Header closeButton>
+    <Modal.Header closeButton>
     <Modal.Title>Update Appointment</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-  {selectedAppointment && (
-    <form>
-      <div className="mb-3">
-        <label htmlFor="fullName" className="form-label">Full Name</label>
-        <input 
-          type="text" 
-          className="form-control" 
-          id="fullName" 
-          value={selectedAppointment.fullName || ''} 
-          onChange={(e) => setSelectedAppointment({...selectedAppointment, fullName: e.target.value})} 
-        />
-      </div>
-      <div className="mb-3">
-        <label htmlFor="status" className="form-label">Status</label>
-        <input 
-          type="text" 
-          className="form-control" 
-          id="status" 
-          value={selectedAppointment.status || ''} 
-          onChange={(e) => setSelectedAppointment({...selectedAppointment, status: e.target.value})} 
-        />
-      </div>
-      <div className="mb-3">
-        <label htmlFor="paidVia" className="form-label">Paid Via</label>
-        <input 
-          type="text" 
-          className="form-control" 
-          id="paidVia" 
-          value={selectedAppointment.paidVia || ''} 
-          onChange={(e) => setSelectedAppointment({...selectedAppointment, paidVia: e.target.value})} 
-        />
-      </div>
-      <div className="mb-3">
-        <label htmlFor="venue" className="form-label">Venue</label>
-        <input 
-          type="text" 
-          className="form-control" 
-          id="venue" 
-          value={selectedAppointment.venue || ''} 
-          onChange={(e) => setSelectedAppointment({...selectedAppointment, venue: e.target.value})} 
-        />
-      </div>
-      <div className="mb-3">
-        <label htmlFor="aptDate" className="form-label">Appointment Date</label>
-        <input 
-          type="text" 
-          className="form-control" 
-          id="aptDate" 
-          value={selectedAppointment.aptDate || ''} 
-          onChange={(e) => setSelectedAppointment({...selectedAppointment, aptDate: e.target.value})} 
-        />
-      </div>
-      <div className="mb-3">
-        <label htmlFor="bookingDetails" className="form-label">Booking Details</label>
-        <textarea 
-          className="form-control" 
-          id="bookingDetails" 
-          rows="3" 
-          value={selectedAppointment.bookingDetails || ''} 
-          onChange={(e) => setSelectedAppointment({...selectedAppointment, bookingDetails: e.target.value})} 
-        ></textarea>
-      </div>
-    </form>
-  )}
-</Modal.Body>
-
-
-    <Modal.Footer>
-    <Button variant="secondary" onClick={handleCloseModal}>
-      Close
-    </Button>
-    <Button variant="primary" onClick={handleSaveChanges}>
-      Save Changes
-    </Button>
-  </Modal.Footer>
-</Modal>
+      </Modal.Header>
+        <Modal.Body>
+          {selectedAppointment && (
+            <form>
+              <div className="mb-3">
+                <label htmlFor="fullName" className="form-label">Full Name</label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  id="fullName" 
+                  value={selectedAppointment.fullName || ''} 
+                  onChange={(e) => setSelectedAppointment({...selectedAppointment, fullName: e.target.value})} 
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="status" className="form-label">Status</label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  id="status" 
+                  value={selectedAppointment.status || ''} 
+                  onChange={(e) => setSelectedAppointment({...selectedAppointment, status: e.target.value})} 
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="paidVia" className="form-label">Paid Via</label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  id="paidVia" 
+                  value={selectedAppointment.paidVia || ''} 
+                  onChange={(e) => setSelectedAppointment({...selectedAppointment, paidVia: e.target.value})} 
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="venue" className="form-label">Venue</label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  id="venue" 
+                  value={selectedAppointment.venue || ''} 
+                  onChange={(e) => setSelectedAppointment({...selectedAppointment, venue: e.target.value})} 
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="aptDate" className="form-label">Appointment Date</label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  id="aptDate" 
+                  value={selectedAppointment.aptDate || ''} 
+                  onChange={(e) => setSelectedAppointment({...selectedAppointment, aptDate: e.target.value})} 
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="bookingDetails" className="form-label">Booking Details</label>
+                <textarea 
+                  className="form-control" 
+                  id="bookingDetails" 
+                  rows="3" 
+                  value={selectedAppointment.bookingDetails || ''} 
+                  onChange={(e) => setSelectedAppointment({...selectedAppointment, bookingDetails: e.target.value})} 
+                ></textarea>
+              </div>
+            </form>
+          )}
+    </Modal.Body>
+        <Modal.Footer>
+        <Button variant="secondary" onClick={handleCloseModal}>
+          Close
+        </Button>
+        <Button variant="primary" onClick={handleSaveChanges}>
+          Save Changes
+        </Button>
+        </Modal.Footer>
+    </Modal>
 
     </div>
   );

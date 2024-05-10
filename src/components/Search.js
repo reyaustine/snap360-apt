@@ -1,7 +1,21 @@
-import { FormControl, InputGroup, DropdownButton , Dropdown} from "react-bootstrap";
+import { FormControl, InputGroup, DropdownButton , Dropdown , Button} from "react-bootstrap";
 import { BsCheck2 } from "react-icons/bs";
+import { useState } from "react";
+import { signOut } from "firebase/auth"; // Import signOut function from Firebase Authentication
+import { auth } from "../firebase"; // Import auth
 
 const DropDown = ({sortBy, onSortByChange, orderBy, onOrderByChange}) => {
+    const handleLogout = () => {
+        signOut(auth) // Sign out the user
+          .then(() => {
+            // Handle successful logout, e.g., redirect to login page
+          })
+          .catch((error) => {
+            // Handle logout error
+            console.error("Error logging out:", error);
+          });
+      };
+
     return(
         <>
             <DropdownButton
@@ -15,6 +29,9 @@ const DropDown = ({sortBy, onSortByChange, orderBy, onOrderByChange}) => {
                 <Dropdown.Item href="#" onClick={() => onOrderByChange('asc')}>ASC {(orderBy == 'asc') && <BsCheck2 className="float-end" />}</Dropdown.Item>
                 <Dropdown.Item href="#" onClick={() => onOrderByChange('desc')}>DESC {(orderBy == 'desc') && <BsCheck2 className="float-end" />}</Dropdown.Item>
             </DropdownButton>
+            <Button size="sm" variant="danger" className="small float-end" onClick={handleLogout}>
+                Logout
+            </Button>
         </>
     ) 
 }
