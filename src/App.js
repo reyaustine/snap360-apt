@@ -6,7 +6,8 @@ import AddAppointment from './components/AddAppointment';
 import AppointmentInfo from './components/AppointmentInfo';
 import { useEffect, useState } from 'react';
 import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import { db, auth } from './firebase'; // Ensure auth is imported from firebase
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 function App() {
   let [appointmentList, setAppointmentList] = useState([]);
@@ -108,7 +109,25 @@ function App() {
       console.error("Error updating appointment:", error);
     }
   };
-  
+
+  useEffect(() => {
+    // Sign out user when the window or page is closed
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      signOut(auth).then(() => {
+        console.log('User signed out.');
+      }).catch((error) => {
+        console.error('Error signing out:', error);
+      });
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
   return (
     <div className="App">
       <Container>
