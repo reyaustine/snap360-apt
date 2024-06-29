@@ -27,6 +27,15 @@ const Dashboard = () => {
   const [removePhotoIndex, setRemovePhotoIndex] = useState(null);
   const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false);
   const [largePhoto, setLargePhoto] = useState(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [captchaValue, setCaptchaValue] = useState('');
+  const [userInputCaptcha, setUserInputCaptcha] = useState('');
+
+  const generateCaptcha = () => {
+    const value = Math.floor(1000 + Math.random() * 9000).toString();
+    setCaptchaValue(value);
+    return value;
+  };
 
   const fetchAppointments = async () => {
     const querySnapshot = await getDocs(collection(db, 'appointments'));
@@ -37,6 +46,10 @@ const Dashboard = () => {
     querySnapshot.forEach(doc => {
       const appointmentData = doc.data();
       console.log('Processing document:', appointmentData);
+
+      if (appointmentData.deleted) {
+        return;
+      }
 
       let fullName = appointmentData.fullName || appointmentData.clientName || 'No Name';
       let aptDate;
@@ -104,6 +117,7 @@ const Dashboard = () => {
         venue: eventData.venue || '',
         otherDetails: eventData.otherDetails || eventData.bookingDetails || '',
         service: eventData.service || '',
+        rate: eventData.rate || '',
         savedBy: eventData.savedBy || '',
         savedDate: eventData.savedDate && eventData.savedDate.toDate ? moment(eventData.savedDate.toDate()).format('MMMM Do YYYY, h:mm:ss a') : '',
         updateDate: eventData.updateDate && eventData.updateDate.toDate ? moment(eventData.updateDate.toDate()).format('MMMM Do YYYY, h:mm:ss a') : '',
@@ -190,6 +204,29 @@ const Dashboard = () => {
       setUpdateSuccess(false);
       fetchAppointments(); // Refresh the event list
     }, 2000);
+  };
+
+  const handleDeleteEvent = () => {
+    setCaptchaValue(generateCaptcha());
+    setShowDeleteConfirmation(true);
+  };
+
+  const confirmDeleteEvent = async () => {
+    if (userInputCaptcha !== captchaValue) {
+      alert('CAPTCHA does not match. Please try again.');
+      return;
+    }
+
+    const eventRef = doc(db, 'appointments', selectedEvent.id);
+
+    await updateDoc(eventRef, {
+      deleted: serverTimestamp(),
+      deletedBy: auth.currentUser.email,
+    });
+
+    setShowDeleteConfirmation(false);
+    setShowModal(false);
+    fetchAppointments(); // Refresh the event list
   };
 
   const handlePhotoClick = (photo) => {
@@ -279,7 +316,7 @@ const Dashboard = () => {
           <Modal.Header closeButton>
             <Modal.Title>
               Event Details
-              <div style={{ fontSize: '0.5em', color: 'gray' }}>
+              <div style={{ fontSize: '0.8em', color: 'gray' }}>
                 updated by: {selectedEvent?.updatedBy || 'N/A'} <br />
                 updated: {selectedEvent?.updateDate || 'N/A'}
               </div>
@@ -394,6 +431,15 @@ const Dashboard = () => {
                   />
                 </Form.Group>
                 <Form.Group className="mb-3">
+                  <Form.Label>Rate</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="rate"
+                    value={selectedEvent.rate}
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
                   <Form.Label>Venue</Form.Label>
                   <Form.Control
                     type="text"
@@ -451,6 +497,34 @@ const Dashboard = () => {
             </Button>
             <Button variant="primary" onClick={handleUpdateEvent}>
               Update Event
+            </Button>
+            <Button variant="danger" onClick={handleDeleteEvent}>
+              Delete Event
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        <Modal show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirm Delete</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Are you sure you want to delete this event?</p>
+            <Form.Group className="mb-3">
+              <Form.Label>Enter the CAPTCHA: {captchaValue}</Form.Label>
+              <Form.Control
+                type="text"
+                value={userInputCaptcha}
+                onChange={(e) => setUserInputCaptcha(e.target.value)}
+              />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowDeleteConfirmation(false)}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={confirmDeleteEvent}>
+              Confirm Delete
             </Button>
           </Modal.Footer>
         </Modal>

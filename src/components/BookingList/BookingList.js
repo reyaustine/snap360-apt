@@ -31,6 +31,9 @@ const BookingList = () => {
 
     querySnapshot.forEach(doc => {
       const bookingData = doc.data();
+      // Skip deleted bookings
+      if (bookingData.deleted) return;
+
       const aptDate = bookingData.aptDate.toDate ? bookingData.aptDate.toDate() : new Date(bookingData.aptDate);
       const month = moment(aptDate).format('MMMM YYYY');
 
