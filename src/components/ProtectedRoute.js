@@ -1,45 +1,18 @@
-// import { useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { auth } from "../firebase";
-// import Login from './Login'; // Import the Login component
-
-// const ProtectedRoute = ({ children }) => {
-//   const [currentUser, setCurrentUser] = useState(null);
-//   const navigate = useNavigate(); // Move useNavigate inside the component
-
-//   useEffect(() => {
-//     const unsubscribe = auth.onAuthStateChanged(user => {
-//       setCurrentUser(user);
-//       if (!user) {
-//         navigate("/login"); // Redirect to login if not authenticated
-//       }
-//     });
-
-//     return unsubscribe;
-//   }, [navigate]);
-
-//   return currentUser ? children : null; // Render children only if user is logged in
-// };
-
-// export default ProtectedRoute;
-
-
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { auth } from "../firebase";
-import Login from './Login'; // Import the Login component
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { auth } from '../firebase';
 
 const ProtectedRoute = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate(); // Move useNavigate inside the component
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       setCurrentUser(user);
       setIsLoading(false); // Update loading state once authentication check is complete
       if (!user) {
-        navigate("/login"); // Redirect to login if not authenticated
+        navigate('/login'); // Redirect to login if not authenticated
       }
     });
 
@@ -52,7 +25,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   // Render children only if user is logged in
-  return currentUser ? children : <Login/>;
+  return currentUser ? children : null;
 };
 
 export default ProtectedRoute;

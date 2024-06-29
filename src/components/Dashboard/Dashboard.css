@@ -1,0 +1,189 @@
+/* Dashboard.css */
+.dashboard {
+    display: flex;
+    flex-direction: column; /* Change to column for better mobile layout */
+}
+
+.content {
+    margin-left: 250px; /* Same width as the sidebar */
+    padding: 20px;
+    width: calc(100% - 250px);
+    height: auto;
+}
+
+/* Add media queries for responsive design */
+@media (max-width: 768px) {
+    .dashboard {
+        flex-direction: column;
+    }
+
+    .content {
+        margin-left: 0; /* Remove margin on smaller screens */
+        width: 100%;
+        padding: 10px;
+    }
+
+    .tab-navigation {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .tab-navigation button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .rbc-calendar {
+        padding: 10px;
+    }
+    
+    .event-count p {
+        text-align: center;
+    }
+}
+
+.header {
+    padding: 20px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.tab-navigation button {
+    margin-right: 10px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.tab-navigation button.active {
+    font-weight: bold;
+    color: #0056b3;
+}
+
+.form-content {
+    margin-top: 20px;
+}
+
+.form-preview {
+    border: 1px solid #e9ecef;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+}
+
+.question-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.question-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.question-item:last-child {
+    border-bottom: none;
+}
+
+.form-footer {
+    border-top: 1px solid #e9ecef;
+    padding-top: 10px;
+}
+
+/* Custom styles for Big Calendar */
+.rbc-calendar {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px; /* Add margin to create space for event count */
+    height: fit-content;
+}
+
+.rbc-toolbar {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 10px;
+}
+
+.rbc-toolbar button {
+    color: #007bff;
+    margin-right: 10px;
+}
+
+.rbc-event {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.rbc-event.past-event {
+    background-color: gray;
+}
+
+.rbc-event.selected-event {
+    background-color: lightgreen;
+}
+
+.rbc-day-bg {
+    min-height: 140px; /* Adjust as needed to fit more events */
+}
+
+.rbc-month-row {
+    min-height: 110px; /* Adjust to ensure rows are tall enough */
+}
+
+.rbc-month-view .rbc-row-content {
+    min-height: 160px; /* Adjust as needed */
+}
+
+.rbc-day-slot .rbc-time-slot {
+    height: auto !important; /* Override default height */
+}
+
+.event-count {
+    margin-top: 20px; /* Add margin to separate from the calendar */
+    padding-bottom: 20px;
+}
+
+/* Modal CSS */
+.event-details-modal {
+  width: 100%;
+  max-width: 600px; /* Default max width */
+}
+
+@media (min-width: 768px) {
+  .event-details-modal {
+    max-width: 900px; /* Wider width for larger screens */
+  }
+}
+
+@media (min-width: 1200px) {
+  .event-details-modal {
+    max-width: 1200px; /* Even wider for very large screens */
+  }
+}
+
+/* Magnifier CSS */
+.magnifier-container {
+    position: relative;
+    display: inline-block;
+    cursor: zoom-in;
+}
+
+.magnifier-image {
+    width: 100px;
+    height: 100px;
+}
+
+.magnifier-glass {
+    position: absolute;
+    border: 3px solid #000;
+    border-radius: 50%;
+    cursor: none;
+    width: 150px;
+    height: 150px;
+    display: none;
+    opacity: 0.5;
+}
+
+.magnifier-container:hover .magnifier-glass {
+    display: block;
+}

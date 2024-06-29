@@ -1,0 +1,26 @@
+.magnifier-container {
+    position: relative;
+    display: inline-block;
+    cursor: zoom-in;
+  }
+  
+  .magnifier-image {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .magnifier-glass {
+    position: absolute;
+    border: 3px solid #000;
+    border-radius: 50%;
+    cursor: none;
+    width: 150px;
+    height: 150px;
+    display: none;
+    opacity: 0.5;
+  }
+  
+  .magnifier-container:hover .magnifier-glass {
+    display: block;
+  }
+  

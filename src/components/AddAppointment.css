@@ -1,0 +1,38 @@
+/* Add this to your CSS file */
+.App {
+    margin: 20px;
+  }
+  
+  .Card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .Card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    font-weight: bold;
+    font-size: 1.2em;
+  }
+  
+  .Form-control {
+    border-radius: 5px;
+    box-shadow: none;
+    border: 1px solid #ced4da;
+  }
+  
+  .Button-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 10px 20px;
+  }
+  
+  .Button-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+  }
+  
