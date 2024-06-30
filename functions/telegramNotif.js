@@ -6,7 +6,7 @@ admin.initializeApp();
 
 const db = admin.firestore();
 
-const botToken = '7026079422:AAGFCWOnD2WcVNQSiWI_ej3p7bufEeiKY04';
+const botToken = functions.config().telegram.bot_token;
 const chatIds = ['-1002175083787']; // Updated chat ID
 
 const sendNotifications = async (events, title) => {
@@ -140,7 +140,7 @@ const getUpcomingEvents = async (startTimestamp, endTimestamp) => {
 };
 
 exports.sendTelegramNotificationUpcoming = functions.region('asia-northeast3').pubsub.schedule('0 7 * * *').timeZone('Asia/Manila').onRun(async (context) => {
-  const now = new Date();
+  const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const endOfYear = new Date(now.getFullYear(), 11, 31); // December 31st of the current year
   const dayOfWeek = now.toLocaleString('en-US', { weekday: 'long' });
@@ -154,7 +154,7 @@ exports.sendTelegramNotificationUpcoming = functions.region('asia-northeast3').p
 });
 
 exports.sendTelegramNotificationToday = functions.region('asia-northeast3').pubsub.schedule('0 6 * * *').timeZone('Asia/Manila').onRun(async (context) => {
-  const now = new Date();
+  const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
   const dayOfWeek = now.toLocaleString('en-US', { weekday: 'long' });
@@ -207,6 +207,13 @@ exports.sendNewEventNotification = functions.region('asia-northeast3').firestore
 
 exports.sendUpdatedEventNotification = functions.region('asia-northeast3').firestore.document('appointments/{appointmentId}').onUpdate(async (change, context) => {
   const data = change.after.data();
+  const previousData = change.before.data();
+
+  // If the event is marked as deleted, do not send an update notification
+  if (data.deleted && !previousData.deleted) {
+    // This event has been deleted, do not send update notification
+    return;
+  }
 
   let eventDate;
   if (data.eventDate && data.eventDate.toDate) {
@@ -242,4 +249,47 @@ exports.sendUpdatedEventNotification = functions.region('asia-northeast3').fires
 
   await Promise.all(promises);
   console.log('Updated event booking message sent successfully');
+});
+
+exports.sendDeletedEventNotification = functions.region('asia-northeast3').firestore.document('appointments/{appointmentId}').onUpdate(async (change, context) => {
+  const data = change.after.data();
+  const previousData = change.before.data();
+
+  // Only send deletion notification if the event has been marked as deleted
+  if (data.deleted && !previousData.deleted) {
+    let eventDate;
+    if (data.eventDate && data.eventDate.toDate) {
+      eventDate = data.eventDate.toDate().toLocaleDateString();
+    } else if (data.eventDate) {
+      eventDate = new Date(data.eventDate).toLocaleDateString();
+    } else {
+      eventDate = 'N/A';
+    }
+
+    const eventTime = data.eventTime || 'N/A';
+    const clientName = data.clientName || 'N/A';
+    const clientNumber = data.clientNumber || 'N/A';
+    const venue = data.venue || 'N/A';
+    const deletedBy = data.deletedBy || 'N/A';
+    const deleteDate = data.deleted ? data.deleted.toDate().toLocaleDateString() : 'N/A';
+
+    const message = `Event Booking Deleted:\n\n- Event Date: ${eventDate}\n- Event Time: ${eventTime}\n- Event Venue: ${venue}\n- Client: ${clientName}\n  Contact: ${clientNumber}\n- Deleted by: ${deletedBy}\n- Delete Date: ${deleteDate}`;
+
+    const promises = chatIds.map(chatId => {
+      const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+      return fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message
+        })
+      });
+    });
+
+    await Promise.all(promises);
+    console.log('Deleted event booking message sent successfully');
+  }
 });
