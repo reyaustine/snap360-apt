@@ -13,6 +13,8 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const localizer = momentLocalizer(moment);
 
+const staffMembers = ['Fred', 'John Lee', 'Kiirt', 'Jhaylou', 'Serdgil', 'Carl', 'Rowell'];
+
 const Dashboard = () => {
   const [events, setEvents] = useState([]);
   const [currentMonthCount, setCurrentMonthCount] = useState(0);
@@ -20,7 +22,7 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('bookings');
   const [showModal, setShowModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null); // Add state for selected date
+  const [selectedDate, setSelectedDate] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState(false);
@@ -122,6 +124,7 @@ const Dashboard = () => {
         savedDate: eventData.savedDate && eventData.savedDate.toDate ? moment(eventData.savedDate.toDate()).format('MMMM Do YYYY, h:mm:ss a') : '',
         updateDate: eventData.updateDate && eventData.updateDate.toDate ? moment(eventData.updateDate.toDate()).format('MMMM Do YYYY, h:mm:ss a') : '',
         updatedBy: eventData.updatedBy || '',
+        staffs: eventData.staffs || [],
       };
 
       setSelectedEvent(eventDetails);
@@ -147,7 +150,16 @@ const Dashboard = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setSelectedEvent({ ...selectedEvent, [name]: value });
+    if (name === 'staffs') {
+      setSelectedEvent(prevState => ({
+        ...prevState,
+        staffs: prevState.staffs.includes(value)
+          ? prevState.staffs.filter(staff => staff !== value)
+          : [...prevState.staffs, value]
+      }));
+    } else {
+      setSelectedEvent({ ...selectedEvent, [name]: value });
+    }
   };
 
   const handleFileChange = (e) => {
@@ -195,6 +207,7 @@ const Dashboard = () => {
       paymentProof: newProofs,
       updateDate: serverTimestamp(),
       updatedBy: auth.currentUser.email,
+      staffs: selectedEvent.staffs,
     });
 
     setIsUpdating(false);
@@ -384,7 +397,7 @@ const Dashboard = () => {
                         onChange={handleInputChange}
                       />
                     </Form.Group>
-                  </Col>
+                    </Col>
                   <Col md={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Payment Status</Form.Label>
@@ -457,6 +470,20 @@ const Dashboard = () => {
                     onChange={handleInputChange}
                     rows={4}
                   />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Assign Staff</Form.Label>
+                  {staffMembers.map((staff, index) => (
+                    <Form.Check
+                      key={index}
+                      type="checkbox"
+                      label={staff}
+                      name="staffs"
+                      value={staff}
+                      checked={selectedEvent.staffs.includes(staff)}
+                      onChange={handleInputChange}
+                    />
+                  ))}
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Payment Proof</Form.Label>
@@ -598,3 +625,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+                
